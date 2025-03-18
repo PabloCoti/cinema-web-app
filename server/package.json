@@ -1,0 +1,27 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "migrate": "npx sequelize-cli db:migrate",
+    "rollback": "npx sequelize-cli db:migrate:undo",
+    "seed": "npx sequelize-cli db:seed:all"
+  },
+  "keywords": [],
+  "author": "Pablo Coti",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "nodemon": "^1.19.4"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.13.0",
+    "sequelize": "^6.37.6",
+    "sequelize-cli": "^6.6.2"
+  }
+}

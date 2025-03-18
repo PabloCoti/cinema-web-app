@@ -1,0 +1,35 @@
+{
+  "name": "cinema-web-app",
+  "version": "1.0.0",
+  "description": "This Cinema Web App is designed to streamline cinema management and enhance user experience. It provides tools for cinema administrators to manage movie schedules, seating arrangements, and reservations efficiently. For users, the app offers the ability to browse available movies, view showtimes, and RSVP for a spot in their preferred screenings with ease.",
+  "main": ".server/app.js",
+  "scripts": {
+    "start": "if-env NODE_ENV=production && npm run start:prod || npm run start:dev",
+    "start:prod": "cd server && npm run start",
+    "start:dev": "concurrently \"npm run server\" \"npm run client\" -k",
+    "client": "cd client && npm run start",
+    "server": "cd server && npm run dev",
+    "install": "cd client && npm install && cd ../server && npm install",
+    "build": "cd client && npm run build",
+    "migrate": "cd server && npm run migrate",
+    "rollback": "cd server && npm run rollback",
+    "seed": "cd server && npm run seed"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PabloCoti/cinema-web-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PabloCoti/cinema-web-app/issues"
+  },
+  "homepage": "https://github.com/PabloCoti/cinema-web-app#readme",
+  "devDependencies": {
+    "concurrently": "^4.1.2"
+  },
+  "dependencies": {
+    "if-env": "^1.0.4"
+  }
+}
