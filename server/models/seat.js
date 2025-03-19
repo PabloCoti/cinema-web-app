@@ -4,12 +4,12 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
     class Seat extends Model {
         static associate(models) {
-            Seat.belongsTo(models.Room, { foreignKey: 'room_id' });
+            Seat.belongsTo(models.Room, { foreignKey: 'roomId' });
         }
     }
 
     Seat.init({
-        room_id: {
+        roomId: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
@@ -29,14 +29,14 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false
         },
-        is_active: {
+        isActive: {
             type: DataTypes.BOOLEAN,
             allowNull: false
         }
     }, {
         sequelize,
         modelName: 'Seat',
-        tableName: 'seats',
+        tableName: 'Seats',
         timestamps: true
     });
 

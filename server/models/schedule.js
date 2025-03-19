@@ -4,13 +4,13 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
     class Schedule extends Model {
         static associate(models) {
-            Schedule.belongsTo(models.Room, { foreignKey: 'room_id' });
-            Schedule.belongsTo(models.Movie, { foreignKey: 'movie_id' });
+            Schedule.belongsTo(models.Room, { foreignKey: 'roomId' });
+            Schedule.belongsTo(models.Movie, { foreignKey: 'movieId' });
         }
     }
 
     Schedule.init({
-        room_id: {
+        roomId: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
                 key: 'id'
             }
         },
-        movie_id: {
+        movieId: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
@@ -26,11 +26,11 @@ module.exports = (sequelize, DataTypes) => {
                 key: 'id'
             }
         },
-        start_time: {
+        startTime: {
             type: DataTypes.DATE,
             allowNull: false
         },
-        end_time: {
+        endTime: {
             type: DataTypes.DATE,
             allowNull: false
         },
@@ -38,14 +38,14 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.FLOAT,
             allowNull: false
         },
-        is_active: {
+        isActive: {
             type: DataTypes.BOOLEAN,
             allowNull: false
         }
     }, {
         sequelize,
         modelName: 'Schedule',
-        tableName: 'schedules',
+        tableName: 'Schedules',
         timestamps: true
     });
 
