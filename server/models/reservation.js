@@ -4,14 +4,14 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
     class Reservation extends Model {
         static associate(models) {
-            Reservation.belongsTo(models.User, { foreignKey: 'user_id' });
-            Reservation.belongsTo(models.Schedule, { foreignKey: 'schedule_id' });
-            Reservation.belongsTo(models.Seat, { foreignKey: 'seat_id' });
+            Reservation.belongsTo(models.User, { foreignKey: 'userId' });
+            Reservation.belongsTo(models.Schedule, { foreignKey: 'scheduleId' });
+            Reservation.belongsTo(models.Seat, { foreignKey: 'seatId' });
         }
     }
 
     Reservation.init({
-        user_id: {
+        userId: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
                 key: 'id'
             }
         },
-        schedule_id: {
+        scheduleId: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
@@ -27,7 +27,7 @@ module.exports = (sequelize, DataTypes) => {
                 key: 'id'
             }
         },
-        seat_id: {
+        seatId: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
@@ -40,14 +40,14 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
             defaultValue: 'reserved'
         },
-        is_active: {
+        isActive: {
             type: DataTypes.BOOLEAN,
             allowNull: false
         }
     }, {
         sequelize,
         modelName: 'Reservation',
-        tableName: 'reservations',
+        tableName: 'Reservations',
         timestamps: true
     });
 

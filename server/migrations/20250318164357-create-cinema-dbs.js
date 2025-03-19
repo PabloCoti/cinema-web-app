@@ -2,18 +2,18 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('users', {
+    await queryInterface.createTable('Users', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      first_name: {
+      name: {
         allowNull: false,
         type: Sequelize.STRING
       },
-      last_name: {
+      lastName: {
         allowNull: false,
         type: Sequelize.STRING
       },
@@ -31,8 +31,9 @@ module.exports = {
         defaultValue: 'user',
         type: Sequelize.STRING
       },
-      is_active: {
+      isActive: {
         allowNull: false,
+        defaultValue: true,
         type: Sequelize.BOOLEAN
       },
       createdAt: {
@@ -45,7 +46,28 @@ module.exports = {
       }
     });
 
-    await queryInterface.createTable('movies', {
+    await queryInterface.createTable('MovieGenres', {
+      id: {
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: Sequelize.INTEGER
+      },
+      name: {
+        allowNull: false,
+        type: Sequelize.STRING
+      },
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE
+      }
+    });
+
+    await queryInterface.createTable('Movies', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -64,15 +86,19 @@ module.exports = {
         allowNull: false,
         type: Sequelize.STRING
       },
-      genre: {
+      genreId: {
         allowNull: false,
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'MovieGenres',
+          key: 'id'
+        }
       },
       duration: {
         allowNull: false,
         type: Sequelize.FLOAT
       },
-      release_date: {
+      releaseDate: {
         allowNull: false,
         type: Sequelize.DATE
       },
@@ -86,7 +112,7 @@ module.exports = {
       }
     });
 
-    await queryInterface.createTable('rooms', {
+    await queryInterface.createTable('Rooms', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -102,15 +128,15 @@ module.exports = {
         allowNull: false,
         type: Sequelize.INTEGER
       },
-      screen_type: {
+      screenType: {
         allowNull: false,
         type: Sequelize.STRING
       },
-      sound_system: {
+      soundSystem: {
         allowNull: false,
         type: Sequelize.STRING
       },
-      is_active: {
+      isActive: {
         allowNull: false,
         type: Sequelize.BOOLEAN
       },
@@ -124,18 +150,18 @@ module.exports = {
       }
     });
 
-    await queryInterface.createTable('seats', {
+    await queryInterface.createTable('Seats', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      room_id: {
+      roomId: {
         allowNull: false,
         type: Sequelize.INTEGER,
         references: {
-          model: 'rooms',
+          model: 'Rooms',
           key: 'id'
         }
       },
@@ -151,7 +177,7 @@ module.exports = {
         allowNull: false,
         type: Sequelize.STRING
       },
-      is_active: {
+      isActive: {
         allowNull: false,
         type: Sequelize.BOOLEAN
       },
@@ -165,40 +191,40 @@ module.exports = {
       }
     });
 
-    await queryInterface.addConstraint('seats', {
-      fields: ['room_id', 'row', 'number'],
+    await queryInterface.addConstraint('Seats', {
+      fields: ['roomId', 'row', 'number'],
       type: 'unique',
       name: 'unique_seat'
     });
 
-    await queryInterface.createTable('schedules', {
+    await queryInterface.createTable('Schedules', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      room_id: {
+      roomId: {
         allowNull: false,
         type: Sequelize.INTEGER,
         references: {
-          model: 'rooms',
+          model: 'Rooms',
           key: 'id'
         }
       },
-      movie_id: {
+      movieId: {
         allowNull: false,
         type: Sequelize.INTEGER,
         references: {
-          model: 'movies',
+          model: 'Movies',
           key: 'id'
         }
       },
-      start_time: {
+      startTime: {
         allowNull: false,
         type: Sequelize.DATE
       },
-      end_time: {
+      endTime: {
         allowNull: false,
         type: Sequelize.DATE
       },
@@ -206,7 +232,7 @@ module.exports = {
         allowNull: false,
         type: Sequelize.FLOAT
       },
-      is_active: {
+      isActive: {
         allowNull: false,
         type: Sequelize.BOOLEAN
       },
@@ -220,46 +246,46 @@ module.exports = {
       }
     });
 
-    await queryInterface.addConstraint('schedules', {
-      fields: ['room_id', 'movie_id', 'start_time'],
+    await queryInterface.addConstraint('Schedules', {
+      fields: ['roomId', 'movieId', 'startTime'],
       type: 'unique',
       name: 'unique_schedule_start_time'
     });
 
-    await queryInterface.addConstraint('schedules', {
-      fields: ['room_id', 'movie_id', 'end_time'],
+    await queryInterface.addConstraint('Schedules', {
+      fields: ['roomId', 'movieId', 'endTime'],
       type: 'unique',
       name: 'unique_schedule_end_time'
     });
 
-    await queryInterface.createTable('reservations', {
+    await queryInterface.createTable('Reservations', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      user_id: {
+      userId: {
         allowNull: false,
         type: Sequelize.INTEGER,
         references: {
-          model: 'users',
+          model: 'Users',
           key: 'id'
         }
       },
-      schedule_id: {
+      scheduleId: {
         allowNull: false,
         type: Sequelize.INTEGER,
         references: {
-          model: 'schedules',
+          model: 'Schedules',
           key: 'id'
         }
       },
-      seat_id: {
+      seatId: {
         allowNull: false,
         type: Sequelize.INTEGER,
         references: {
-          model: 'seats',
+          model: 'Seats',
           key: 'id'
         }
       },
@@ -267,14 +293,23 @@ module.exports = {
         allowNull: false,
         type: Sequelize.STRING
       },
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE
+      }
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('reservations');
-    await queryInterface.dropTable('schedules');
-    await queryInterface.dropTable('seats');
-    await queryInterface.dropTable('rooms');
-    await queryInterface.dropTable('movies');
-    await queryInterface.dropTable('users');
+    await queryInterface.dropTable('Reservations');
+    await queryInterface.dropTable('Schedules');
+    await queryInterface.dropTable('Seats');
+    await queryInterface.dropTable('Rooms');
+    await queryInterface.dropTable('Movies');
+    await queryInterface.dropTable('MovieGenres');
+    await queryInterface.dropTable('Users');
   }
 };
