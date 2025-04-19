@@ -15,3 +15,11 @@ export const signIn = async (credentials) => {
 export const logOut = async (credentials) => {
     return apiClient.post("/auth/logout", credentials);
 };
+
+export const listUsers = async () => {
+    return apiClient.get("/auth/users");
+}
+
+export const updateUser = async (userId, updates) => {
+    return apiClient.put(`/auth/users/${userId}`, updates);
+}

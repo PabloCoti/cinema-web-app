@@ -50,7 +50,7 @@ exports.signIn = async (req, res) => {
         const token = jwt.sign(
             { id: user.id, role: user.role },
             process.env.JWT_SECRET,
-            { expiresIn: "1h" }
+            { expiresIn: remember ? "9999h" : "1h" }
         );
 
         res.cookie("authToken", token, {
@@ -68,27 +68,30 @@ exports.signIn = async (req, res) => {
 
 exports.listUsers = async (req, res) => {
     try {
-        const { name, lastName, email, role } = req.query;
-        const query = {};
-
-        if (name) query.name = name;
-        if (lastName) query.lastName = lastName;
-        if (email) query.email = email;
-        if (role) query.role = role;
-
-        const users = await User.find(query, '-password');
-        res.json(users);
+        const users = await User.findAll({ attributes: ['id', 'name', 'lastName', 'email', 'role', 'isActive'] });
+        res.status(200).json(users);
     } catch (error) {
         res.status(500).json({ error: 'Error fetching users' });
     }
 };
 
-exports.deleteUser = async (req, res) => {
+exports.updateUser = async (req, res) => {
     try {
         const { id } = req.params;
-        await User.findByIdAndDelete(id);
-        res.json({ message: 'User deleted successfully' });
+        const updates = req.body;
+        console.log('updates', updates);
+
+
+        const user = await User.findByPk(id);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        await user.update(updates);
+        res.status(200).json({ message: 'User updated successfully', user });
+        console.log('User updated successfully', user);
+
     } catch (error) {
-        res.status(500).json({ error: 'Error deleting user' });
+        res.status(500).json({ error: 'Error updating user' });
     }
 };

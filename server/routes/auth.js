@@ -9,6 +9,6 @@ router.post('/logout', authController.logOut);
 router.get('/validate-session', authMiddleware.authenticateToken, authController.validateToken);
 
 router.get('/users', authMiddleware.authenticateToken, authMiddleware.verifyAdmin, authController.listUsers);
-router.delete('/users/:id', authMiddleware.authenticateToken, authMiddleware.verifyAdmin, authController.deleteUser);
+router.put('/users/:id', authMiddleware.authenticateToken, authMiddleware.verifyAdmin, authController.updateUser);
 
 module.exports = router;
