@@ -1,35 +1,32 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 
 import Layout from "../../components/Layout";
 import { useAuth } from "../../contexts/AuthContext";
 import { listUsers, updateUser } from "../../api/userService";
+import { SnackbarContext } from "../../contexts/SnackbarContext";
+import TableWithPagination from "../../components/TableWithPagination";
+import ConfirmationModal from "../../components/ConfirmationModal";
 
 import Box from "@mui/material/Box";
 import Menu from "@mui/material/Menu";
 import Fade from "@mui/material/Fade";
 import Badge from "@mui/material/Badge";
-import Table from "@mui/material/Table";
-import Paper from "@mui/material/Paper";
 import Modal from "@mui/material/Modal";
-import Alert from "@mui/material/Alert";
 import MuiCard from "@mui/material/Card";
 import Button from "@mui/material/Button";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import TableRow from "@mui/material/TableRow";
 import Backdrop from "@mui/material/Backdrop";
-import Snackbar from "@mui/material/Snackbar";
-import TableBody from "@mui/material/TableBody";
+import EditIcon from "@mui/icons-material/Edit";
 import TableCell from "@mui/material/TableCell";
-import TableHead from "@mui/material/TableHead";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
-import TableFooter from "@mui/material/TableFooter";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { styled, useTheme } from "@mui/material/styles";
-import TableContainer from "@mui/material/TableContainer";
-import TablePagination from "@mui/material/TablePagination";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   position: "absolute",
@@ -56,20 +53,13 @@ const Card = styled(MuiCard)(({ theme }) => ({
 }));
 
 export default function ListUsers() {
-  const theme = useTheme();
   const auth = useAuth();
+  const theme = useTheme();
 
   const [users, setUsers] = useState([]);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-
-  const handleSnackbarClose = () => {
-    setSnackbarOpen(false);
-  };
-
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [selectedRoles, setSelectedRoles] = useState({});
+
+  const { showSnackbar } = useContext(SnackbarContext);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -87,18 +77,6 @@ export default function ListUsers() {
     fetchUsers();
   }, []);
 
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - users.length) : 0;
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
   const [anchorElActions, setAnchorElActions] = useState({
     anchorEl: null,
     userId: null,
@@ -115,6 +93,13 @@ export default function ListUsers() {
   const [openDeactivateModal, setOpenDeactivateModal] = useState(
     users.reduce((acc, user) => {
       acc[`user-deactivate-${user.id}`] = false;
+      return acc;
+    }, {})
+  );
+
+  const [openActivateModal, setOpenActivateModal] = useState(
+    users.reduce((acc, user) => {
+      acc[`user-activate-${user.id}`] = false;
       return acc;
     }, {})
   );
@@ -138,6 +123,13 @@ export default function ListUsers() {
         setOpenUpdateRoleModal((prev) => ({
           ...prev,
           [`user-roles-change-${anchorElActions.userId}`]: true,
+        }));
+        break;
+
+      case "activate":
+        setOpenActivateModal((prev) => ({
+          ...prev,
+          [`user-activate-${anchorElActions.userId}`]: true,
         }));
         break;
 
@@ -175,20 +167,48 @@ export default function ListUsers() {
                     : user
                 )
               );
-              setSnackbarMessage("Usuario actualizado con éxito");
-              setSnackbarOpen(true);
+              showSnackbar("Usuario actualizado con éxito", "success");
             }
           } catch (error) {
-            setSnackbarMessage(
-              "Error al actualizar el usuario, por favor, contacta con soporte o intenta de nuevo."
+            showSnackbar(
+              "Error al actualizar el usuario, por favor, contacta con soporte o intenta de nuevo.",
+              "error"
             );
-            setSnackbarOpen(true);
           }
         } else {
           setSelectedRoles((prev) => ({
             ...prev,
             [userId]: args["userRole"],
           }));
+        }
+        break;
+
+      case "user-activate":
+        setOpenActivateModal((prev) => ({
+          ...prev,
+          [`user-activate-${userId}`]: false,
+        }));
+
+        if (args["action"] === "confirm") {
+          try {
+            const response = await updateUser(userId, {
+              isActive: true,
+            });
+
+            if (response.status === 200) {
+              setUsers((prevUsers) =>
+                prevUsers.map((user) =>
+                  user.id === userId ? { ...user, isActive: true } : user
+                )
+              );
+              showSnackbar("Usuario activado con éxito", "success");
+            }
+          } catch (error) {
+            showSnackbar(
+              "Error al activar el usuario, por favor, contacta con soporte o intenta de nuevo.",
+              "error"
+            );
+          }
         }
         break;
 
@@ -205,20 +225,18 @@ export default function ListUsers() {
             });
 
             if (response.status === 200) {
-              setUsers((prevUsers) => {
-                return prevUsers.map((user) =>
+              setUsers((prevUsers) =>
+                prevUsers.map((user) =>
                   user.id === userId ? { ...user, isActive: false } : user
-                );
-              });
-
-              setSnackbarMessage("Usuario desactivado con éxito");
-              setSnackbarOpen(true);
+                )
+              );
+              showSnackbar("Usuario desactivado con éxito", "success");
             }
           } catch (e) {
-            setSnackbarMessage(
-              "Error al desactivar el usuario, por favor, contacta con soporte o intenta de nuevo."
+            showSnackbar(
+              "Error al desactivar el usuario, por favor, contacta con soporte o intenta de nuevo.",
+              "error"
             );
-            setSnackbarOpen(true);
           }
         }
         break;
@@ -235,6 +253,179 @@ export default function ListUsers() {
     user: "Usuario",
   };
 
+  const headers = ["Estado", "Nombre", "Correo", "Rol", ""];
+
+  const renderRow = (user) => (
+    <TableRow key={user.id}>
+      <TableCell>
+        <Box display="flex" alignItems="center" justifyContent="center">
+          {user.isActive ? (
+            <Badge color="success" badgeContent="Activo" />
+          ) : (
+            <Badge color="error" badgeContent="Inactivo" />
+          )}
+        </Box>
+      </TableCell>
+      <TableCell>{user.name}</TableCell>
+      <TableCell>{user.email}</TableCell>
+      <TableCell>{roles[user.role]}</TableCell>
+      <TableCell align="right">
+        {auth.user.id !== user.id && (
+          <>
+            <IconButton
+              id={`actions-button-${user.id}`}
+              size="small"
+              aria-controls={open ? `actions-menu-${user.id}` : undefined}
+              aria-haspopup="true"
+              aria-expanded={open ? "true" : undefined}
+              onClick={(event) => handleOpenMenuActions(event, user.id)}
+            >
+              <MoreVertIcon />
+            </IconButton>
+            <Menu
+              id={`actions-menu-${user.id}`}
+              anchorEl={anchorElActions.anchorEl}
+              open={open && anchorElActions.userId === user.id}
+              onClose={() => handleMenuItemActions()}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "right",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+            >
+              {user.isActive ? (
+                [
+                  <MenuItem
+                    key={`change-role-${user.id}`}
+                    onClick={() => handleMenuItemActions("changeRole")}
+                  >
+                    <EditIcon fontSize="small" sx={{ mr: 0.5 }} />
+                    Cambiar Rol
+                  </MenuItem>,
+                  <MenuItem
+                    sx={{ color: "warning.main" }}
+                    key={`deactivate-${user.id}`}
+                    onClick={() => handleMenuItemActions("deactivate")}
+                  >
+                    <RemoveCircleIcon fontSize="small" sx={{ mr: 0.5 }} />
+                    Desactivar
+                  </MenuItem>,
+                ]
+              ) : (
+                <MenuItem
+                  sx={{ color: "success.main" }}
+                  key={`activate-${user.id}`}
+                  onClick={() => handleMenuItemActions("activate")}
+                >
+                  <CheckCircleIcon fontSize="small" sx={{ mr: 0.5 }} />
+                  Activar
+                </MenuItem>
+              )}
+            </Menu>
+            <Modal
+              id={`user-roles-change-${user.id}`}
+              aria-labelledby="role-change-modal-title"
+              aria-describedby="role-change-modal-description"
+              open={openUpdateRoleModal[`user-roles-change-${user.id}`]}
+              closeAfterTransition
+              slots={{ backdrop: Backdrop }}
+              slotProps={{
+                backdrop: {
+                  timeout: 500,
+                },
+              }}
+              disableEscapeKeyDown
+            >
+              <Fade in={openUpdateRoleModal[`user-roles-change-${user.id}`]}>
+                <Card>
+                  <Select
+                    value={selectedRoles[user.id] || ""}
+                    onChange={(event) =>
+                      handleRoleChange(user.id, event.target.value)
+                    }
+                  >
+                    {Object.entries(roles).map(([key, value]) => (
+                      <MenuItem key={`${user.id}-${key}`} value={key}>
+                        {value}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: theme.breakpoints.up("md")
+                        ? "flex-end"
+                        : "space-between",
+                      flexWrap: theme.breakpoints.down("md")
+                        ? "wrap"
+                        : "nowrap",
+                      gap: "1rem",
+                    }}
+                  >
+                    <Button
+                      variant="outlined"
+                      onClick={() =>
+                        handleCloseModal("user-roles-change", user.id, {
+                          action: "cancel",
+                          userRole: user.role,
+                        })
+                      }
+                    >
+                      Cancelar
+                    </Button>
+                    <Button
+                      variant="contained"
+                      onClick={() =>
+                        handleCloseModal("user-roles-change", user.id, {
+                          action: "save",
+                        })
+                      }
+                    >
+                      Guardar
+                    </Button>
+                  </div>
+                </Card>
+              </Fade>
+            </Modal>
+            <ConfirmationModal
+              key={`user-deactivate-${user.id}`}
+              open={openDeactivateModal[`user-deactivate-${user.id}`]}
+              onClose={() =>
+                handleCloseModal("user-deactivate", user.id, {
+                  action: "cancel",
+                })
+              }
+              onConfirm={() =>
+                handleCloseModal("user-deactivate", user.id, {
+                  action: "confirm",
+                })
+              }
+              title="¿Estás seguro de hacer esto?"
+              description="Esta acción desactivará al usuario y no podrá iniciar sesión."
+            />
+            <ConfirmationModal
+              key={`user-activate-${user.id}`}
+              open={openActivateModal[`user-activate-${user.id}`]}
+              onClose={() =>
+                handleCloseModal("user-activate", user.id, { action: "cancel" })
+              }
+              onConfirm={() =>
+                handleCloseModal("user-activate", user.id, {
+                  action: "confirm",
+                })
+              }
+              title="¿Estás seguro de hacer esto?"
+              description="Esta acción activará al usuario y podrá iniciar sesión."
+            />
+          </>
+        )}
+      </TableCell>
+    </TableRow>
+  );
+
   return (
     <Layout>
       <Breadcrumbs>
@@ -242,264 +433,11 @@ export default function ListUsers() {
         <Typography>Lista de usuarios</Typography>
       </Breadcrumbs>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Estado</TableCell>
-              <TableCell>Nombre</TableCell>
-              <TableCell>Correo</TableCell>
-              <TableCell>Rol</TableCell>
-              <TableCell></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {(rowsPerPage > 0
-              ? users.slice(
-                  page * rowsPerPage,
-                  page * rowsPerPage + rowsPerPage
-                )
-              : users
-            ).map((user) => (
-              <TableRow key={user.id}>
-                <TableCell>
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                  >
-                    {user.isActive ? (
-                      <Badge color="success" badgeContent="Activo" />
-                    ) : (
-                      <Badge color="error" badgeContent="Inactivo" />
-                    )}
-                  </Box>
-                </TableCell>
-                <TableCell>{user.name}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>{roles[user.role]}</TableCell>
-                <TableCell align="right">
-                  {auth.user.id !== user.id && (
-                    <>
-                      <IconButton
-                        id={`actions-button-${user.id}`}
-                        size="small"
-                        aria-controls={
-                          open ? `actions-menu-${user.id}` : undefined
-                        }
-                        aria-haspopup="true"
-                        aria-expanded={open ? "true" : undefined}
-                        onClick={(event) =>
-                          handleOpenMenuActions(event, user.id)
-                        }
-                      >
-                        <MoreVertIcon />
-                      </IconButton>
-                      <Menu
-                        id={`actions-menu-${user.id}`}
-                        anchorEl={anchorElActions.anchorEl}
-                        open={open && anchorElActions.userId === user.id}
-                        onClose={() => handleMenuItemActions()}
-                        anchorOrigin={{
-                          vertical: "bottom",
-                          horizontal: "right",
-                        }}
-                        transformOrigin={{
-                          vertical: "top",
-                          horizontal: "right",
-                        }}
-                      >
-                        <MenuItem
-                          onClick={() => handleMenuItemActions("changeRole")}
-                        >
-                          Cambiar Rol
-                        </MenuItem>
-                        {user.isActive && (
-                          <MenuItem
-                            onClick={() => handleMenuItemActions("deactivate")}
-                          >
-                            Desactivar
-                          </MenuItem>
-                        )}
-                      </Menu>
-
-                      <Modal
-                        id={`user-roles-change-${user.id}`}
-                        aria-labelledby="role-change-modal-title"
-                        aria-describedby="role-change-modal-description"
-                        open={
-                          openUpdateRoleModal[`user-roles-change-${user.id}`]
-                        }
-                        closeAfterTransition
-                        slots={{ backdrop: Backdrop }}
-                        slotProps={{
-                          backdrop: {
-                            timeout: 500,
-                          },
-                        }}
-                        disableEscapeKeyDown
-                      >
-                        <Fade
-                          in={
-                            openUpdateRoleModal[`user-roles-change-${user.id}`]
-                          }
-                        >
-                          <Card>
-                            <Select
-                              value={selectedRoles[user.id] || ""}
-                              onChange={(event) =>
-                                handleRoleChange(user.id, event.target.value)
-                              }
-                            >
-                              {Object.entries(roles).map(([key, value]) => (
-                                <MenuItem key={`${user.id}-${key}`} value={key}>
-                                  {value}
-                                </MenuItem>
-                              ))}
-                            </Select>
-                            <div
-                              style={{
-                                display: "flex",
-                                justifyContent: theme.breakpoints.up("md")
-                                  ? "flex-end"
-                                  : "space-between",
-                                flexWrap: theme.breakpoints.down("md")
-                                  ? "wrap"
-                                  : "nowrap",
-                                gap: "1rem",
-                              }}
-                            >
-                              <Button
-                                variant="outlined"
-                                onClick={() =>
-                                  handleCloseModal(
-                                    "user-roles-change",
-                                    user.id,
-                                    {
-                                      action: "cancel",
-                                      userRole: user.role,
-                                    }
-                                  )
-                                }
-                              >
-                                Cancelar
-                              </Button>
-                              <Button
-                                variant="contained"
-                                onClick={() =>
-                                  handleCloseModal(
-                                    "user-roles-change",
-                                    user.id,
-                                    {
-                                      action: "save",
-                                    }
-                                  )
-                                }
-                              >
-                                Guardar
-                              </Button>
-                            </div>
-                          </Card>
-                        </Fade>
-                      </Modal>
-                      <Modal
-                        id={`user-deactivate-${user.id}`}
-                        aria-labelledby="deactivate-user-modal-title"
-                        aria-describedby="deactivate-user-modal-description"
-                        open={openDeactivateModal[`user-deactivate-${user.id}`]}
-                        closeAfterTransition
-                        slots={{ backdrop: Backdrop }}
-                        slotProps={{
-                          backdrop: {
-                            timeout: 500,
-                          },
-                        }}
-                        disableEscapeKeyDown
-                      >
-                        <Fade
-                          in={openDeactivateModal[`user-deactivate-${user.id}`]}
-                        >
-                          <Card>
-                            <Typography
-                              variant="h6"
-                              gutterBottom
-                              align="center"
-                            >
-                              ¿Estás seguro de hacer esto?
-                            </Typography>
-                            <div
-                              style={{
-                                display: "flex",
-                                justifyContent: "space-between",
-                                gap: "1rem",
-                              }}
-                            >
-                              <Button
-                                variant="outlined"
-                                style={{ width: "50%" }}
-                                onClick={() =>
-                                  handleCloseModal("user-deactivate", user.id, {
-                                    action: "cancel",
-                                  })
-                                }
-                              >
-                                Cancelar
-                              </Button>
-                              <Button
-                                variant="contained"
-                                style={{ width: "50%" }}
-                                onClick={() =>
-                                  handleCloseModal("user-deactivate", user.id, {
-                                    action: "confirm",
-                                  })
-                                }
-                              >
-                                Confirmar
-                              </Button>
-                            </div>
-                          </Card>
-                        </Fade>
-                      </Modal>
-                    </>
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
-            {emptyRows > 0 && (
-              <TableRow style={{ height: 53 * emptyRows }}>
-                <TableCell colSpan={3} />
-              </TableRow>
-            )}
-          </TableBody>
-          <TableFooter>
-            <TableRow>
-              <TablePagination
-                page={page}
-                count={users.length}
-                rowsPerPage={rowsPerPage}
-                onPageChange={handleChangePage}
-                rowsPerPageOptions={[5, 10, 20, 50]}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-                labelRowsPerPage="Por página"
-              />
-            </TableRow>
-          </TableFooter>
-        </Table>
-      </TableContainer>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Alert
-          onClose={handleSnackbarClose}
-          severity="success"
-          sx={{ width: "100%" }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
+      <TableWithPagination
+        headers={headers}
+        rows={users}
+        renderRow={renderRow}
+      />
     </Layout>
   );
 }
