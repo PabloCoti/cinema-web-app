@@ -85,6 +85,14 @@ export default function NavBar() {
                     variant="text"
                     color="info"
                     size="small"
+                    onClick={() => navigate("/schedules/list")}
+                  >
+                    Funciones
+                  </Button>
+                  <Button
+                    variant="text"
+                    color="info"
+                    size="small"
                     onClick={() => navigate("/rooms/list")}
                   >
                     Salas
@@ -129,13 +137,6 @@ export default function NavBar() {
                     "aria-labelledby": "user-button",
                   }}
                 >
-                  <MenuItem
-                    onClick={() => {
-                      navigate("/profile");
-                    }}
-                  >
-                    Perfil
-                  </MenuItem>
                   <MenuItem
                     onClick={() => {
                       navigate("/reservations");
@@ -197,6 +198,9 @@ export default function NavBar() {
                 <MenuItem onClick={() => navigate("/")}>Inicio</MenuItem>
                 {user?.role === "admin" && (
                   <>
+                    <MenuItem onClick={() => navigate("/schedules/list")}>
+                      Funciones
+                    </MenuItem>
                     <MenuItem onClick={() => navigate("/rooms/list")}>
                       Salas
                     </MenuItem>
@@ -212,16 +216,7 @@ export default function NavBar() {
                       onClick={() => {
                         navigate("/profile");
                       }}
-                    >
-                      <Button
-                        color="primary"
-                        variant="outlined"
-                        fullWidth
-                        onClick={signOut}
-                      >
-                        Perfil
-                      </Button>
-                    </MenuItem>
+                    ></MenuItem>
                     <MenuItem
                       onClick={() => {
                         navigate("/reservations");

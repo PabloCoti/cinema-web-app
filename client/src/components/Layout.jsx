@@ -1,15 +1,16 @@
-import * as React from "react";
 import { useContext } from "react";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
-import { SnackbarContext } from "../contexts/SnackbarContext";
+import { Outlet } from "react-router";
 
-import NavBar from "./NavBar";
+import Alert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
 import Container from "@mui/material/Container";
-import AppTheme from "../shared-theme/AppTheme";
 import CssBaseline from "@mui/material/CssBaseline";
 
-export default function AppAppBar({ children }, props) {
+import NavBar from "./NavBar";
+import AppTheme from "../shared-theme/AppTheme";
+import { SnackbarContext } from "../contexts/SnackbarContext";
+
+export default function Layout(props) {
   const { snackbarOpen, snackbarMessage, snackbarSeverity, closeSnackbar } =
     useContext(SnackbarContext);
 
@@ -22,7 +23,7 @@ export default function AppAppBar({ children }, props) {
         component="main"
         sx={{ display: "flex", flexDirection: "column", my: 16, gap: 4 }}
       >
-        {children}
+        <Outlet />
       </Container>
       <Snackbar
         open={snackbarOpen}

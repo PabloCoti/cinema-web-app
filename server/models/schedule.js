@@ -26,12 +26,16 @@ module.exports = (sequelize, DataTypes) => {
                 key: 'id'
             }
         },
-        startTime: {
+        date: {
             type: DataTypes.DATE,
             allowNull: false
         },
+        startTime: {
+            type: DataTypes.TIME,
+            allowNull: false
+        },
         endTime: {
-            type: DataTypes.DATE,
+            type: DataTypes.TIME,
             allowNull: false
         },
         price: {

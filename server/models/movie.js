@@ -5,7 +5,7 @@ const {
 module.exports = (sequelize, DataTypes) => {
   class Movie extends Model {
     static associate(models) {
-      Movie.belongsTo(models.MovieGenre, { foreignKey: 'genreId' });
+      Movie.belongsTo(models.MovieGenre, { foreignKey: 'genreId', as: 'Genre' });
     }
   }
   Movie.init({

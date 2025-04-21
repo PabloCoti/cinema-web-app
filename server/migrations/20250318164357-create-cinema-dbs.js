@@ -83,7 +83,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       image: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.STRING
       },
       genreId: {
@@ -217,13 +217,17 @@ module.exports = {
           key: 'id'
         }
       },
-      startTime: {
+      date: {
         allowNull: false,
         type: Sequelize.DATE
       },
+      startTime: {
+        allowNull: false,
+        type: Sequelize.TIME
+      },
       endTime: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.TIME
       },
       price: {
         allowNull: false,
@@ -244,15 +248,9 @@ module.exports = {
     });
 
     await queryInterface.addConstraint('Schedules', {
-      fields: ['roomId', 'movieId', 'startTime'],
+      fields: ['roomId', 'startTime', 'endTime', 'date'],
       type: 'unique',
-      name: 'unique_schedule_start_time'
-    });
-
-    await queryInterface.addConstraint('Schedules', {
-      fields: ['roomId', 'movieId', 'endTime'],
-      type: 'unique',
-      name: 'unique_schedule_end_time'
+      name: 'unique_schedule_time'
     });
 
     await queryInterface.createTable('Reservations', {
