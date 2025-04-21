@@ -15,6 +15,7 @@ app.use(
 );
 
 app.use("/auth", require("./routes/auth"));
+app.use("/rooms", require("./routes/room"));
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

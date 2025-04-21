@@ -25,10 +25,6 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: false
         },
-        type: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
         isActive: {
             type: DataTypes.BOOLEAN,
             allowNull: false

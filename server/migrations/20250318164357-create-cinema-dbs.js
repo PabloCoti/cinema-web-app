@@ -138,7 +138,8 @@ module.exports = {
       },
       isActive: {
         allowNull: false,
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
+        defaultValue: true
       },
       createdAt: {
         allowNull: false,
@@ -172,10 +173,6 @@ module.exports = {
       number: {
         allowNull: false,
         type: Sequelize.INTEGER
-      },
-      type: {
-        allowNull: false,
-        type: Sequelize.STRING
       },
       isActive: {
         allowNull: false,
