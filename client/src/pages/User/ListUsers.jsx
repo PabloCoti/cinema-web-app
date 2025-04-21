@@ -1,11 +1,10 @@
 import { useState, useEffect, useContext } from "react";
 
-import Layout from "../../components/Layout";
 import { useAuth } from "../../contexts/AuthContext";
 import { listUsers, updateUser } from "../../api/userService";
 import { SnackbarContext } from "../../contexts/SnackbarContext";
-import TableWithPagination from "../../components/TableWithPagination";
 import ConfirmationModal from "../../components/ConfirmationModal";
+import TableWithPagination from "../../components/TableWithPagination";
 
 import Box from "@mui/material/Box";
 import Menu from "@mui/material/Menu";
@@ -427,7 +426,7 @@ export default function ListUsers() {
   );
 
   return (
-    <Layout>
+    <>
       <Breadcrumbs>
         <Typography>Usuarios</Typography>
         <Typography>Lista de usuarios</Typography>
@@ -438,6 +437,6 @@ export default function ListUsers() {
         rows={users}
         renderRow={renderRow}
       />
-    </Layout>
+    </>
   );
 }

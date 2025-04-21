@@ -1,8 +1,8 @@
 import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router";
 
-import Layout from "../../components/Layout";
 import { SnackbarContext } from "../../contexts/SnackbarContext";
+import ConfirmationModal from "../../components/ConfirmationModal";
 import TableWithPagination from "../../components/TableWithPagination";
 import { listRooms, updateRoom, deleteRoom } from "../../api/roomService";
 
@@ -21,12 +21,12 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
-import ConfirmationModal from "../../components/ConfirmationModal";
 
 export default function ListRooms() {
   const navigate = useNavigate();
-  const { showSnackbar } = useContext(SnackbarContext);
   const [rooms, setRooms] = useState([]);
+  const { showSnackbar } = useContext(SnackbarContext);
+  const headers = ["Estado", "Código", "Capacidad", ""];
 
   useEffect(() => {
     const fetchRooms = async () => {
@@ -188,8 +188,6 @@ export default function ListRooms() {
     }
   };
 
-  const headers = ["Estado", "Código", "Capacidad", ""];
-
   const renderRow = (room) => (
     <TableRow key={room.id}>
       <TableCell>
@@ -305,7 +303,7 @@ export default function ListRooms() {
   );
 
   return (
-    <Layout>
+    <>
       <Breadcrumbs>
         <Typography>Salas</Typography>
         <Typography>Lista de salas</Typography>
@@ -326,6 +324,6 @@ export default function ListRooms() {
         rows={rooms}
         renderRow={renderRow}
       />
-    </Layout>
+    </>
   );
 }

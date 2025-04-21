@@ -85,6 +85,14 @@ export default function NavBar() {
                     variant="text"
                     color="info"
                     size="small"
+                    onClick={() => navigate("/schedules/list")}
+                  >
+                    Funciones
+                  </Button>
+                  <Button
+                    variant="text"
+                    color="info"
+                    size="small"
                     onClick={() => navigate("/rooms/list")}
                   >
                     Salas
@@ -197,6 +205,9 @@ export default function NavBar() {
                 <MenuItem onClick={() => navigate("/")}>Inicio</MenuItem>
                 {user?.role === "admin" && (
                   <>
+                    <MenuItem onClick={() => navigate("/schedules/list")}>
+                      Funciones
+                    </MenuItem>
                     <MenuItem onClick={() => navigate("/rooms/list")}>
                       Salas
                     </MenuItem>
