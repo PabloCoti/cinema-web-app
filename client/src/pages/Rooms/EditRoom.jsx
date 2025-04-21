@@ -1,6 +1,5 @@
 import { useState, useContext, useEffect } from "react";
 
-import Layout from "../../components/Layout";
 import { SnackbarContext } from "../../contexts/SnackbarContext";
 import { listRooms, getRoom, updateRoom } from "../../api/roomService";
 
@@ -217,7 +216,7 @@ export default function EditRoom() {
   };
 
   return (
-    <Layout>
+    <>
       <Breadcrumbs>
         <Typography>Salas</Typography>
         <Typography>Editar sala</Typography>
@@ -351,6 +350,6 @@ export default function EditRoom() {
           Actualizar sala
         </Button>
       </Box>
-    </Layout>
+    </>
   );
 }

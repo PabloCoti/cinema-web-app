@@ -1,7 +1,6 @@
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router";
 
-import Layout from "../../components/Layout";
 import { listRooms, createRoom } from "../../api/roomService";
 import { SnackbarContext } from "../../contexts/SnackbarContext";
 
@@ -179,7 +178,7 @@ export default function CreateRoom() {
   };
 
   return (
-    <Layout>
+    <>
       <Breadcrumbs>
         <Typography>Salas</Typography>
         <Typography>Crear sala</Typography>
@@ -313,6 +312,6 @@ export default function CreateRoom() {
           Crear sala
         </Button>
       </Box>
-    </Layout>
+    </>
   );
 }
