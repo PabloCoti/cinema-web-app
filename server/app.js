@@ -1,7 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-require("dotenv").config();
+
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 
 const app = express();
 
@@ -17,5 +18,5 @@ app.use(
 app.use("/auth", require("./routes/auth"));
 app.use("/rooms", require("./routes/room"));
 
-const PORT = process.env.PORT;
+const PORT = process.env.API_PORT;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
