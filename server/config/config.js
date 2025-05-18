@@ -11,4 +11,5 @@ const dbConfig = {
 
 module.exports = {
   "local": dbConfig,
+  "production": dbConfig,
 };
