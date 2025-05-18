@@ -22,7 +22,7 @@ services:
     networks:
       - cinema-network
     env_file:
-      - .env
+      - ./server/.env
     ports:
       - "${API_PORT}:${API_PORT}"
     volumes:
@@ -34,15 +34,15 @@ services:
   client:
     build:
       context: ./client
-      dockerfile: ./Dockerfile
+      dockerfile: ./Dockerfile.dev
     container_name: cinema-client
     restart: always
     networks:
       - cinema-network
     env_file:
-      - .env
+      - ./client/.env
     ports:
-      - "${PORT}:${PORT}"
+      - "${CLIENT_PORT}:${CLIENT_PORT}"
     volumes:
       - ./client:/app
       - client_node_modules:/app/node_modules
