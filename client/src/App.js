@@ -44,11 +44,13 @@ export default function App() {
                 <Route path="schedules/:movieId" element={<ListMovieSchedules />} />
               </Route>
 
-              <Route path="/reservations" element={<Outlet />}>
-                <Route index element={<ListReservations />} />
-                <Route path="view/:id" element={<ViewReservation />} />
-                <Route path="create/:scheduleId" element={<CreateReservation />} />
-                <Route path="qr" element={<ReservationQR />} />
+              <Route element={<PrivateRoute requiredRole="user" />}>
+                <Route path="/reservations" element={<Outlet />}>
+                  <Route index element={<ListReservations />} />
+                  <Route path="qr" element={<ReservationQR />} />
+                  <Route path="view/:id" element={<ViewReservation />} />
+                  <Route path="create/:scheduleId" element={<CreateReservation />} />
+                </Route>
               </Route>
 
               <Route element={<PrivateRoute requiredRole="admin" />}>

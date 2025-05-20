@@ -147,7 +147,11 @@ export default function ViewReservation() {
           </Button>
         </Grid>
       </Grid>
-      <Box display="flex" justifyContent="flex-end" mt={4}>
+      <Box
+        display="flex"
+        justifyContent={{ xs: "center", sm: "flex-end" }}
+        mt={4}
+      >
         <Button
           variant="contained"
           color="primary"

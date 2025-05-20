@@ -214,11 +214,6 @@ export default function NavBar() {
                   <>
                     <MenuItem
                       onClick={() => {
-                        navigate("/profile");
-                      }}
-                    ></MenuItem>
-                    <MenuItem
-                      onClick={() => {
                         navigate("/reservations");
                       }}
                     >
