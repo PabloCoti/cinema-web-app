@@ -21,6 +21,10 @@ const PrivateRoute = ({ requiredRole }) => {
   }, []);
 
   if (isValid === null) return <div>Loading...</div>; // TODO: Make a proper loading view
+
+  if (!isValid || (requiredRole === "user" && userRole !== requiredRole))
+    return <Navigate to="/signin" />;
+
   if (!isValid || (requiredRole && userRole !== requiredRole))
     return <Navigate to="/responses/not-found" />;
 
