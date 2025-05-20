@@ -4,7 +4,7 @@ const authMiddleware = require('../middleware/auth');
 const roomController = require('../controllers/room');
 
 router.get('/', authMiddleware.authenticateToken, authMiddleware.verifyAdmin, roomController.listRooms);
-router.get('/:id', authMiddleware.authenticateToken, authMiddleware.verifyAdmin, roomController.getRoom);
+router.get('/:id', authMiddleware.authenticateToken, roomController.getRoom);
 
 router.post('/', authMiddleware.authenticateToken, authMiddleware.verifyAdmin, roomController.createRoom);
 router.put('/:id', authMiddleware.authenticateToken, authMiddleware.verifyAdmin, roomController.updateRoom);

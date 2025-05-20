@@ -1,8 +1,9 @@
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const path = require("path");
 
-require('dotenv').config({ path: require('path').resolve(__dirname, '.env') });
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
 const app = express();
 
@@ -17,6 +18,12 @@ app.use(
 
 app.use("/auth", require("./routes/auth"));
 app.use("/rooms", require("./routes/room"));
+app.use('/movies', require('./routes/movie'));
+app.use('/schedules', require('./routes/schedule'));
+app.use('/movie-genres', require('./routes/movieGenre'));
+app.use('/reservations', require('./routes/reservations'));
 
-const PORT = process.env.API_PORT;
+app.use('/public', express.static(path.join(__dirname, 'public')));
+
+const PORT = process.env.PORT;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
