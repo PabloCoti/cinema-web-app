@@ -1,9 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router";
-
 import { formatDate } from "../../utils/dateTime";
-import { listSchedules } from "../../api/scheduleService";
+import {
+  listSchedules,
+  updateSchedule,
+  deleteSchedule,
+} from "../../api/scheduleService";
 import TableWithPagination from "../../components/TableWithPagination";
+import ConfirmationModal from "../../components/ConfirmationModal";
+import { SnackbarContext } from "../../contexts/SnackbarContext";
 
 import Box from "@mui/material/Box";
 import Menu from "@mui/material/Menu";
@@ -27,6 +32,11 @@ export default function ListSchedules() {
     anchorEl: null,
     scheduleId: null,
   });
+  const [openDeactivateModal, setOpenDeactivateModal] = useState({});
+  const [openActivateModal, setOpenActivateModal] = useState({});
+  const [openDeleteModal, setOpenDeleteModal] = useState({});
+
+  const { showSnackbar } = useContext(SnackbarContext);
 
   const open = Boolean(anchorElActions.anchorEl);
   const headers = [
@@ -67,18 +77,64 @@ export default function ListSchedules() {
       case "edit":
         navigate(`/schedules/edit/${scheduleId}`);
         break;
-
       case "deactivate":
+        setOpenDeactivateModal((prev) => ({ ...prev, [scheduleId]: true }));
         break;
-
       case "activate":
+        setOpenActivateModal((prev) => ({ ...prev, [scheduleId]: true }));
         break;
-
       case "delete":
+        setOpenDeleteModal((prev) => ({ ...prev, [scheduleId]: true }));
         break;
-
       default:
         break;
+    }
+  };
+
+  const handleCloseModal = async (type, scheduleId, confirm = false) => {
+    if (type === "deactivate") {
+      setOpenDeactivateModal((prev) => ({ ...prev, [scheduleId]: false }));
+      if (confirm) {
+        try {
+          await updateSchedule(scheduleId, { isActive: false });
+          setSchedules((prev) =>
+            prev.map((s) =>
+              s.id === scheduleId ? { ...s, isActive: false } : s
+            )
+          );
+          showSnackbar("Función desactivada correctamente", "success");
+        } catch {
+          showSnackbar("Error al desactivar la función", "error");
+        }
+      }
+    }
+    if (type === "activate") {
+      setOpenActivateModal((prev) => ({ ...prev, [scheduleId]: false }));
+      if (confirm) {
+        try {
+          await updateSchedule(scheduleId, { isActive: true });
+          setSchedules((prev) =>
+            prev.map((s) =>
+              s.id === scheduleId ? { ...s, isActive: true } : s
+            )
+          );
+          showSnackbar("Función activada correctamente", "success");
+        } catch {
+          showSnackbar("Error al activar la función", "error");
+        }
+      }
+    }
+    if (type === "delete") {
+      setOpenDeleteModal((prev) => ({ ...prev, [scheduleId]: false }));
+      if (confirm) {
+        try {
+          await deleteSchedule(scheduleId);
+          setSchedules((prev) => prev.filter((s) => s.id !== scheduleId));
+          showSnackbar("Función eliminada correctamente", "success");
+        } catch {
+          showSnackbar("Error al eliminar la función", "error");
+        }
+      }
     }
   };
 
@@ -131,29 +187,25 @@ export default function ListSchedules() {
             <EditIcon fontSize="small" sx={{ mr: 0.5 }} />
             Editar
           </MenuItem>
-          {schedule.isActive
-            ? [
-                <MenuItem
-                  sx={{ color: "warning.main" }}
-                  key={`deactivate-${schedule.id}`}
-                  onClick={() =>
-                    handleMenuItemActions("deactivate", schedule.id)
-                  }
-                >
-                  <RemoveCircleIcon fontSize="small" sx={{ mr: 0.5 }} />
-                  Desactivar
-                </MenuItem>,
-              ]
-            : [
-                <MenuItem
-                  sx={{ color: "success.main" }}
-                  key={`activate-${schedule.id}`}
-                  onClick={() => handleMenuItemActions("activate", schedule.id)}
-                >
-                  <CheckCircleIcon fontSize="small" sx={{ mr: 0.5 }} />
-                  Activar
-                </MenuItem>,
-              ]}
+          {schedule.isActive ? (
+            <MenuItem
+              sx={{ color: "warning.main" }}
+              key={`deactivate-${schedule.id}`}
+              onClick={() => handleMenuItemActions("deactivate", schedule.id)}
+            >
+              <RemoveCircleIcon fontSize="small" sx={{ mr: 0.5 }} />
+              Desactivar
+            </MenuItem>
+          ) : (
+            <MenuItem
+              sx={{ color: "success.main" }}
+              key={`activate-${schedule.id}`}
+              onClick={() => handleMenuItemActions("activate", schedule.id)}
+            >
+              <CheckCircleIcon fontSize="small" sx={{ mr: 0.5 }} />
+              Activar
+            </MenuItem>
+          )}
           <MenuItem
             sx={{ color: "error.main" }}
             key={`delete-${schedule.id}`}
@@ -163,6 +215,27 @@ export default function ListSchedules() {
             Eliminar
           </MenuItem>
         </Menu>
+        <ConfirmationModal
+          open={!!openDeactivateModal[schedule.id]}
+          onClose={() => handleCloseModal("deactivate", schedule.id, false)}
+          onConfirm={() => handleCloseModal("deactivate", schedule.id, true)}
+          title="¿Desactivar función?"
+          description="Esta acción desactivará la función y no podrá ser reservada."
+        />
+        <ConfirmationModal
+          open={!!openActivateModal[schedule.id]}
+          onClose={() => handleCloseModal("activate", schedule.id, false)}
+          onConfirm={() => handleCloseModal("activate", schedule.id, true)}
+          title="¿Activar función?"
+          description="Esta acción activará la función y podrá ser reservada."
+        />
+        <ConfirmationModal
+          open={!!openDeleteModal[schedule.id]}
+          onClose={() => handleCloseModal("delete", schedule.id, false)}
+          onConfirm={() => handleCloseModal("delete", schedule.id, true)}
+          title="¿Eliminar función?"
+          description="Esta acción eliminará la función y no podrá ser recuperada."
+        />
       </TableCell>
     </TableRow>
   );
