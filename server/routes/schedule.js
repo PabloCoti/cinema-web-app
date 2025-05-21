@@ -1,14 +1,13 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
+const { authenticateToken } = require("../middleware/auth");
+const scheduleController = require("../controllers/schedule");
 
-const authMiddleware = require('../middleware/auth');
-const scheduleController = require('../controllers/schedule');
+router.get("/", scheduleController.listSchedules);
+router.get("/:id", scheduleController.getSchedule);
 
-router.get('/', scheduleController.listSchedules);
-router.get('/:id', scheduleController.getSchedule);
-router.get('/movie/:movieId', scheduleController.getMovieSchedules);
-
-router.post('/', authMiddleware.authenticateToken, authMiddleware.verifyAdmin, scheduleController.createSchedule);
-router.put('/:id', authMiddleware.authenticateToken, authMiddleware.verifyAdmin, scheduleController.updateSchedule);
+router.post("/", authenticateToken, scheduleController.createSchedule);
+router.put("/:id", authenticateToken, scheduleController.updateSchedule);
+router.delete("/:id", authenticateToken, scheduleController.deleteSchedule);
 
 module.exports = router;
